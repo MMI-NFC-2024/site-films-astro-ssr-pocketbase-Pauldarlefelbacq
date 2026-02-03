@@ -11,6 +11,6 @@
   },
   "dependencies": {
     "astro": "^5.17.1",
-    "pocketbase-typegen": "^1.3.3"Z
+    "pocketbase-typegen": "^1.3.3"
   }
 }
