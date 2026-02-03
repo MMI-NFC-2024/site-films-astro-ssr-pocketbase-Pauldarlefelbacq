@@ -1,0 +1,9 @@
+---
+import type { PersonneRecord } from '../pocketbase-types'
+
+interface Props {
+    personne: PersonneRecord
+}
+const personne = Astro.props.personne;
+---
+<a href = {`/personnes/${personne.id}`}>{personne.nom}</a>
