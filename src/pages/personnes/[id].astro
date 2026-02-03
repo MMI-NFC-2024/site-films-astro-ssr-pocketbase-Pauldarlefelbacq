@@ -1,7 +1,0 @@
----
-export const prerender = false;
-const { id } = Astro.params;
-
-const personne = await Astro.locals.pb.collection("personne").getOne(id);
----
-<h1>Affichage d'une personne</h1>

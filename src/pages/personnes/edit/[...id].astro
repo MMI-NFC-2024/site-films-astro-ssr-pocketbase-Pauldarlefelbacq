@@ -1,0 +1,63 @@
+---
+import slug from 'slug';
+export const prerender = false
+import Layout from "../../../layout/Layout.astro";
+const { id } = Astro.params;
+let message = null;
+
+
+if (Astro.request.method === "POST") {
+   const data = (await Astro.request.formData());
+   const personne = await Astro.locals.pb.collection("personne").create(data);
+   .catch (err => {
+    console.error("Erreur lors de la création de la personne : ", err)
+    message = err.message;
+   })
+   if (personne){
+    return Astro.redirect(`/personnes/${personne.id}-${slug(personne.nom ?? "Inconnu")}`)
+   }
+}
+---
+<Layout>
+    <h1>Ajouter une personne</h1>
+    { message && 
+    <p class="text-red-700">{ message }</p>
+    }
+    <form method="post">
+
+        {id && <input type ="hidden" name ="id" value = { id }>}
+
+        <input name="user" type="hidden" value={Astro.locals.pb.authStore.record.id}>
+        <!-- <input name="user" type="hidden" value={Astro.locals.pb.authStore.record.id}> -->
+        <label class="block">
+            <span class="text-gray-700">Nom :</span>
+            <input name="nom" type="text" class="mt-1 block w-full" placeholder=""> 
+        </label>
+        <label class="block">
+            <span class="text-gray-700">Prénom :</span>
+            <input name="prenom" type="text" class="mt-1 block w-full" placeholder=""> 
+        </label>
+        <label class="block">
+            <span class="text-gray-700">Nationalité :</span>
+            <input name="nationalite" type="text" class="mt-1 block w-full" placeholder=""> 
+        </label>
+        <label class="block">
+            <span class="text-gray-700">Date de naissance :</span>
+            <input name="date_naissance" type="date" class="mt-1 block w-full" placeholder=""> 
+        </label>
+        <label class="block">
+            <span class="text-gray-700">Date de décés (optionnelle) :</span>
+            <input name="date_deces" type="date" class="mt-1 block w-full" placeholder=""> 
+        </label>
+        <fieldset>
+            {Object.entries(PersonneProfessionOptions).map(([key, value]) => (
+                <label class="block">
+                <input name="profession" type="checkbox" class="mt-1 block w-full" checked={personne.profession.include(value)}> 
+                <span>{ key }</span>
+            </label>
+            ))}
+        </fieldset>
+        
+        <button type="submit">Envoyer</button>
+    </form>
+</Layout>

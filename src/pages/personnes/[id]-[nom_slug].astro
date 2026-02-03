@@ -1,0 +1,17 @@
+---
+import { Debug } from "astro:components";
+import Layout from "../../layout/Layout.astro";
+
+export const prerender = false;
+const { id } = Astro.params;
+
+const personne = await Astro.locals.pb.collection("personne").getOne(id);
+---
+<Layout>
+    <h1>Affichage d'une personne</h1>
+    <Debug { personne }/>
+    {
+    Astro.locals.pb.authStore.record?.id === personne.user && 
+    <a href = {`/personnes/edit/${personne.id}`}>Editer une personne</a>
+    }
+</Layout>
