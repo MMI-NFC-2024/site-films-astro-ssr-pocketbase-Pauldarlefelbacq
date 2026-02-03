@@ -1,9 +1,9 @@
-import Pocketbase from 'pocketbase';
+import pb from 'pocketbase';
 
 import { defineMiddleware } from 'astro/middleware';
 
 export const onRequest = defineMiddleware(async ({locals, request, isPrerendered }: any, next:() => any) =>{
-    locals.pb = new Pocketbase("http://127.0.0.1:8090");
+    locals.pb = new pb("http://127.0.0.1:8090");
 
     if (!isPrerendered)
     {
