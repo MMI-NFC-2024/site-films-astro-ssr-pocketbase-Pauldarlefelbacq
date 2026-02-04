@@ -3,9 +3,11 @@ import slug from 'slug';
 export const prerender = false
 import Layout from "../../../layout/Layout.astro";
 import { FilmGenreOptions, FilmPaysOptions, type FilmResponse } from '../../../pocketbase-types';
+import { PersonneProfessionOptions } from '../../../pocketbase-types';
 const { id } = Astro.params;
 let message = null;
 let film = {} as FilmResponse;
+const personne = await Astro.locals.pb.collection("personne").getFullList()
 
 if (id)
 {
@@ -54,6 +56,10 @@ if (Astro.request.method === "POST") {
             <input name="duree" type="number" class="mt-1 block w-full" placeholder="" value={film.duree}> 
         </label>
         <label class="block">
+            <span class="text-gray-700">Synopsis :</span>
+            <input name="synopsis" type="text" class="mt-1 block w-full" placeholder="" value={film.synopsis}> 
+        </label>
+        <label class="block">
             <span class="text-gray-700">Date de sortie :</span>
             <input name="date_sortie" type="date" class="mt-1 block w-full" placeholder="" value={film.date_sortie}> 
         </label>
@@ -65,7 +71,7 @@ if (Astro.request.method === "POST") {
              {
                 Object.entries(FilmGenreOptions).map(([key, value]) =>
                     <label>
-                        <input type="checkbox" name="profession" value={value}
+                        <input type="checkbox" name="genre" value={value}
                         checked={film.genre?.includes(value)}
                         />
                         {key}
@@ -77,7 +83,7 @@ if (Astro.request.method === "POST") {
              {
                 Object.entries(FilmPaysOptions).map(([key, value]) =>
                     <label>
-                        <input type="checkbox" name="profession" value={value}
+                        <input type="checkbox" name="pays" value={value}
                         checked={film.pays?.includes(value)}
                         />
                         {key}
@@ -85,7 +91,42 @@ if (Astro.request.method === "POST") {
                 )
             }
         </fieldset>
-        <select name="" id=""></select>
+        <select name="realisateur" class="mt-1 block">
+            <option>Choisir un réalisateur</option>
+            {
+                personne.map((p) =>(
+                <option
+                selected={film.realisateur === p.id}
+                value={p.id}>
+                    {p.nom} {p.prenom}
+                </option>
+                ))
+            }
+        </select>
+        <select name="producteur" class="mt-1 block" multiple>
+            <option>Choisir un producteur</option>
+            {
+                personne.map((p) =>(
+                    <option
+                    selected={film.producteur?.includes(p.id)}
+                    value={p.id}>
+                        { p.nom } { p.prenom }
+                    </option>
+                ))
+            }
+        </select>
+        <select name="producteur" class="mt-1 block" multiple>
+            <option>Choisir un scénariste</option>
+            {
+                personne.map((p) =>(
+                    <option
+                    selected={film.scenariste?.includes(p.id)}
+                    value={p.id}>
+                        { p.nom } { p.prenom }
+                    </option>
+                ))
+            }
+        </select>
         
         <button>
             { id ? "Mettre à jour" : "Ajouter" }

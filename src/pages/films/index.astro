@@ -14,4 +14,8 @@ console.log(films);
             <li><LinkFilms film={film}/></li>
         ))}
     </ul>
+    { 
+    Astro.locals.pb.authStore.isValid &&
+    <a href="/films/edit/">Ajouter un nouveau film</a>
+    }
 </Layout>
