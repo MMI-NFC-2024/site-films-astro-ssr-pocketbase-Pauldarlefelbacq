@@ -2,7 +2,7 @@ import type { TypedPocketBase } from "./pocketbase-types";
 
 declare global {
     namespace App {
-        interface locals {
+        interface Locals {
             pb:TypedPocketBase;
         }
     }

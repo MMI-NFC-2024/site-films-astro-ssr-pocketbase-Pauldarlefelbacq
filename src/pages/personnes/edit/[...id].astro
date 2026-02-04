@@ -2,33 +2,49 @@
 import slug from 'slug';
 export const prerender = false
 import Layout from "../../../layout/Layout.astro";
+import { PersonneProfessionOptions, type PersonneResponse } from '../../../pocketbase-types';
 const { id } = Astro.params;
 let message = null;
+let personne = {} as PersonneResponse;
 
+if (id)
+{
+    personne = await Astro.locals.pb.collection("personne").getOne(id)
+}
 
 if (Astro.request.method === "POST") {
-   const data = (await Astro.request.formData());
-   const personne = await Astro.locals.pb.collection("personne").create(data);
-   .catch (err => {
-    console.error("Erreur lors de la création de la personne : ", err)
-    message = err.message;
-   })
-   if (personne){
-    return Astro.redirect(`/personnes/${personne.id}-${slug(personne.nom ?? "Inconnu")}`)
-   }
+    const data = await Astro.request.formData();
+    const personneCree = await (id
+            ?(Astro.locals.pb.collection("personne").update(id!, data))
+            :(Astro.locals.pb.collection("personne").create(data))
+        )
+        .catch(err => {
+            console.error("Erreur de sauvegarde de la personne : ", err);
+            message = err.message ;
+            return null
+        })
+    ;
+    if (personneCree) {
+        return Astro.redirect(`/personnes/${personneCree.id}-${slug(personneCree.nom ?? "Inconnu")}`)
+    }
 }
 ---
 <Layout>
-    <h1>Ajouter une personne</h1>
-    { message && 
+        <h1>{id ? "Editer une personne" : "Ajouter une personne"}</h1>
+    
+    {
+    message && 
     <p class="text-red-700">{ message }</p>
     }
     <form method="post">
 
-        {id && <input type ="hidden" name ="id" value = { id }>}
+        {
+        id && 
+        <input type ="hidden" name ="id" value = { id }>
+        }
 
-        <input name="user" type="hidden" value={Astro.locals.pb.authStore.record.id}>
-        <!-- <input name="user" type="hidden" value={Astro.locals.pb.authStore.record.id}> -->
+        <input name="user" type="hidden" value={Astro.locals.pb.authStore.record?.id}>
+        {/* <input name="user" type="hidden" value={Astro.locals.pb.authStore.record.id}> */}
         <label class="block">
             <span class="text-gray-700">Nom :</span>
             <input name="nom" type="text" class="mt-1 block w-full" placeholder=""> 
@@ -50,14 +66,20 @@ if (Astro.request.method === "POST") {
             <input name="date_deces" type="date" class="mt-1 block w-full" placeholder=""> 
         </label>
         <fieldset>
-            {Object.entries(PersonneProfessionOptions).map(([key, value]) => (
-                <label class="block">
-                <input name="profession" type="checkbox" class="mt-1 block w-full" checked={personne.profession.include(value)}> 
-                <span>{ key }</span>
-            </label>
-            ))}
+             {
+                Object.entries(PersonneProfessionOptions).map(([key, value]) =>
+                    <label>
+                        <input type="checkbox" name="profession" value={value}
+                        checked={personne.profession?.includes(value)}
+                        />
+                        {key}
+                    </label>
+                )
+            }
         </fieldset>
         
-        <button type="submit">Envoyer</button>
+        <button>
+            { id ? "Mettre à jour" : "Ajouter" }
+        </button>
     </form>
 </Layout>
