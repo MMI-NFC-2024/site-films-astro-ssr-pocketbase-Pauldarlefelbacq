@@ -150,6 +150,7 @@ export type RoleRecord = {
 	id: string
 	nom?: string
 	updated: IsoAutoDateString
+	user?: RecordIdString
 }
 
 export type UsersRecord = {

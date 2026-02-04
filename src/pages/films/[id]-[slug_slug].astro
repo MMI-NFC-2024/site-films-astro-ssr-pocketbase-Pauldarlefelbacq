@@ -1,14 +1,53 @@
 ---
 import { Debug } from "astro:components";
 import Layout from "../../layout/Layout.astro";
+import type { FilmResponse } from "../../pocketbase-types";
+import type { PersonneResponse } from "../../pocketbase-types";
 
 export const prerender = false;
-const { id } = Astro.params;
+const { id } = Astro.params as { id:string };
 
-const film = await Astro.locals.pb.collection("film").getOne(id);
+const film = await Astro.locals.pb.collection("film")
+.getOne<FilmResponse<{
+    realisateur: PersonneResponse, producteur: PersonneResponse[], scenariste: PersonneResponse[] 
+    }>>
+    (id, { expand: "realisateur, producteur, scenariste"});
 ---
 <Layout>
     <h1>Affichage d'une film</h1>
-    <Debug { film }/>
+    <!-- <Debug { film } /> -->
+    <h2 class="font-bold">Réalisateur</h2>
+    <p>{film.expand.realisateur?.nom} - {film.expand.realisateur?.prenom}</p>
+    {
+        film.expand.producteur.length > 1 ? (
+            <h2 class="font-bold">Producteurs</h2>
+        )
+        :
+        (
+            <h2 class="font-bold">Producteur</h2>
+        )
+    }
+    {
+        film.expand.producteur &&
+        film.expand.producteur.map((prod) => (
+        <p>{prod.nom} - {prod.prenom}</p>
+        ))
+    }
+
+    {
+        film.expand.scenariste.length > 1 ? (
+            <h2 class="font-bold">Scenaristes</h2>
+        )
+        :
+        (
+            <h2 class="font-bold">Scenariste</h2>
+        )
+    }
+    {
+        film.expand.scenariste &&
+        film.expand.scenariste.map((scen) => (
+        <p>{scen.nom} - {scen.prenom}</p>
+        ))
+    }
     <a href = {`/films/edit/${film.id}`}>Editer un film</a>
 </Layout>
