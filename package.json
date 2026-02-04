@@ -7,7 +7,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "type": "npx pocketbase-typegen --db /pocketase/pb_data/data.db --out ./src/pocketbase-types.ts"
+    "type": "npx pocketbase-typegen --db ./pocketase/pb_data/data.db --out ./src/pocketbase-types.ts"
   },
   "dependencies": {
     "@astrojs/node": "^9.5.2",

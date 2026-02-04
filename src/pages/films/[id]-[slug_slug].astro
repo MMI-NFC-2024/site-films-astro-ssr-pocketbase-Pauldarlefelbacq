@@ -1,0 +1,14 @@
+---
+import { Debug } from "astro:components";
+import Layout from "../../layout/Layout.astro";
+
+export const prerender = false;
+const { id } = Astro.params;
+
+const film = await Astro.locals.pb.collection("film").getOne(id);
+---
+<Layout>
+    <h1>Affichage d'une film</h1>
+    <Debug { film }/>
+    <a href = {`/films/edit/${film.id}`}>Editer un film</a>
+</Layout>

@@ -1,0 +1,11 @@
+---
+import slug from 'slug';
+import type { FilmRecord } from '../pocketbase-types';
+
+interface Props {
+    film: FilmRecord;
+}
+
+const { film } = Astro.props;
+---
+<a href = {`/films/${film.id}-${slug(film.titre ?? "Inconnu")}`}>{film.titre}</a>

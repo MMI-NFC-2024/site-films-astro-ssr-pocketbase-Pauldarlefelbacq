@@ -11,6 +11,7 @@ export enum Collections {
 	Mfas = "_mfas",
 	Otps = "_otps",
 	Superusers = "_superusers",
+	Film = "film",
 	Personne = "personne",
 	Users = "users",
 }
@@ -93,6 +94,37 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
+export enum FilmGenreOptions {
+	"action" = "action",
+	"fantaisie" = "fantaisie",
+	"science-fiction" = "science-fiction",
+	"romance" = "romance",
+	"sport" = "sport",
+}
+
+export enum FilmPaysOptions {
+	"FR" = "FR",
+	"US" = "US",
+	"GB" = "GB",
+	"DE" = "DE",
+	"AU" = "AU",
+}
+export type FilmRecord = {
+	created: IsoAutoDateString
+	date_sortie?: IsoDateString
+	duree?: number
+	genre?: FilmGenreOptions[]
+	id: string
+	langue?: string
+	pays?: FilmPaysOptions[]
+	producteur?: RecordIdString[]
+	realisateur?: RecordIdString[]
+	scenariste?: RecordIdString[]
+	synopsis?: HTMLString
+	titre?: string
+	updated: IsoAutoDateString
+}
+
 export enum PersonneProfessionOptions {
 	"realisateur" = "realisateur",
 	"acteur" = "acteur",
@@ -130,6 +162,7 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
+export type FilmResponse<Texpand = unknown> = Required<FilmRecord> & BaseSystemFields<Texpand>
 export type PersonneResponse<Texpand = unknown> = Required<PersonneRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
@@ -141,6 +174,7 @@ export type CollectionRecords = {
 	_mfas: MfasRecord
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
+	film: FilmRecord
 	personne: PersonneRecord
 	users: UsersRecord
 }
@@ -151,6 +185,7 @@ export type CollectionResponses = {
 	_mfas: MfasResponse
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
+	film: FilmResponse
 	personne: PersonneResponse
 	users: UsersResponse
 }

@@ -1,0 +1,94 @@
+---
+import slug from 'slug';
+export const prerender = false
+import Layout from "../../../layout/Layout.astro";
+import { FilmGenreOptions, FilmPaysOptions, type FilmResponse } from '../../../pocketbase-types';
+const { id } = Astro.params;
+let message = null;
+let film = {} as FilmResponse;
+
+if (id)
+{
+    film = await Astro.locals.pb.collection("film").getOne(id)
+}
+
+if (Astro.request.method === "POST") {
+    const data = await Astro.request.formData();
+    const filmCree = await (id
+            ?(Astro.locals.pb.collection("film").update(id!, data))
+            :(Astro.locals.pb.collection("film").create(data))
+        )
+        .catch(err => {
+            console.error("Erreur de sauvegarde du film : ", err);
+            message = err.message ;
+            return null
+        })
+    ;
+    if (filmCree) {
+        return Astro.redirect(`/films/${filmCree.id}-${slug(filmCree.titre ?? "Inconnu")}`)
+    }
+}
+---
+<Layout>
+        <h1>{id ? "Editer une film" : "Ajouter une film"}</h1>
+    
+    {
+    message && 
+    <p class="text-red-700">{ message }</p>
+    }
+    <form method="post">
+
+        {
+        id && 
+        <input type ="hidden" name ="id" value = { id }>
+        }
+
+        <input name="user" type="hidden" value={Astro.locals.pb.authStore.record?.id}>
+        {/* <input name="user" type="hidden" value={Astro.locals.pb.authStore.record.id}> */}
+        <label class="block">
+            <span class="text-gray-700">Titre :</span>
+            <input name="titre" type="text" class="mt-1 block w-full" placeholder="" value={film.titre}> 
+        </label>
+        <label class="block">
+            <span class="text-gray-700">Durée :</span>
+            <input name="duree" type="number" class="mt-1 block w-full" placeholder="" value={film.duree}> 
+        </label>
+        <label class="block">
+            <span class="text-gray-700">Date de sortie :</span>
+            <input name="date_sortie" type="date" class="mt-1 block w-full" placeholder="" value={film.date_sortie}> 
+        </label>
+        <label class="block">
+            <span class="text-gray-700">Langue :</span>
+            <input name="langue" type="text" class="mt-1 block w-full" placeholder="" value={film.langue}> 
+        </label>
+        <fieldset>
+             {
+                Object.entries(FilmGenreOptions).map(([key, value]) =>
+                    <label>
+                        <input type="checkbox" name="profession" value={value}
+                        checked={film.genre?.includes(value)}
+                        />
+                        {key}
+                    </label>
+                )
+            }
+        </fieldset>
+        <fieldset>
+             {
+                Object.entries(FilmPaysOptions).map(([key, value]) =>
+                    <label>
+                        <input type="checkbox" name="profession" value={value}
+                        checked={film.pays?.includes(value)}
+                        />
+                        {key}
+                    </label>
+                )
+            }
+        </fieldset>
+        <select name="" id=""></select>
+        
+        <button>
+            { id ? "Mettre à jour" : "Ajouter" }
+        </button>
+    </form>
+</Layout>

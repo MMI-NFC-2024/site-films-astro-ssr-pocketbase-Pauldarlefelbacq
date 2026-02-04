@@ -1,0 +1,17 @@
+---
+import LinkFilms from "../../components/LinkFilms.astro";
+import Layout from "../../layout/Layout.astro";
+export const prerender = false;
+
+const films = await Astro.locals.pb.collection("film").getFullList();
+console.log(films);
+
+---
+<Layout>
+    <h1>Hey films</h1>
+    <ul>
+        {films.map((film) => (
+            <li><LinkFilms film={film}/></li>
+        ))}
+    </ul>
+</Layout>
